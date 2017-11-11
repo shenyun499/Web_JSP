@@ -1,0 +1,103 @@
+一:连接数据库
+加载驱动，获得连接
+
+1.Connection(连接)
+    用法:DriverManager.getConnection(url, musername, mpassword)
+    作用:获得数据库之间的连接
+
+2.Class.forName(driver)
+    用法:驱动一般需要先下载。值一般为driver = "com.mysql.jdbc.Driver"
+    作用:加载驱动，与数据库连接
+
+3.DriverManager.getConnection(url, musername, mpassword)
+    用法:url = "jdbc:mysql://localhost:3306/test"
+	 musername 是指数据库名
+	 mpassword 是指数据库密码
+    作用:返回一个对象，获得与数据库的连接
+
+4.部分代码演示
+<%
+	String username = request.getParameter("username");
+	String password = request.getParameter("password");
+	
+	//连接数据库
+		String driver = "com.mysql.jdbc.Driver";
+		String url = "jdbc:mysql://localhost:3306/test";
+		String musername = "root";
+		String mpassword = "1104428690a";
+		//数据库的一个对象
+		Connection conn = null;
+		try {
+			Class.forName(driver);
+			conn = (Connection) DriverManager.getConnection(url, musername, mpassword);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+%>
+
+
+二:数据库查询数据
+
+1.PreparedStatement
+    用法:PreparedStatement 的对象调用executeQuery()方法，并返回一个结果集。
+    @PreparedStatement pStmt = 
+	conn.prepareStatement("select * from tb_user where UName = '" + user + "' and Pwd = '" + pwd + "'");
+
+    @String sql = "select *from students_information where username = ? and password = ?;
+     try {
+	PreparedStatement pstmt = null;
+	
+		ResultSet rs = null;
+	
+		try {
+			pstmt = (PreparedStatement) conn.prepareStatement(sql);
+			pstmt.setString(1, username);
+			pstmt.setString(2,password);
+			//写入信息
+			rs = pstmt.executeQuery();
+     }
+}
+    作用:PreparedStatement预编译。先把sql语句先进行预编译，然后再执行。
+
+2.ResultSet(结果集)
+    用法:while (rs.next()) {
+	System.out.println("rs.getString(1));
+	}
+    作用:ResultSet指查询结果集合，可以循环获取查询结果
+
+3.部分代码演示
+	//查询数据是否存在
+		String sql = "select *from students_information where username = ? and password = ?";	//查找密码和用户名
+//		String sql = "select *from students_information where username = '"+username+"' and password ='"+
+			      password+"'"; //这种方法也行，但是不用setString	
+		
+		PreparedStatement pstmt = null;
+	
+		ResultSet rs = null;
+	
+		try {
+			pstmt = (PreparedStatement) conn.prepareStatement(sql);
+			/*pstmt.setString(1, username);
+			pstmt.setString(2,password);*/
+			//写入信息
+			rs = pstmt.executeQuery();
+			
+			if (!rs.next()) {
+				response.sendRedirect("login_false.jsp");
+			} else if (password.equals("") || username.equals("") || username == null) { //name为空或者或者密码				为空(就是没有输入信息时)或者引用为空
+				//跳回登陆页面
+				response.sendRedirect("login_false.jsp");
+				System.out.print("输入不能为空!");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			rs.close();
+			pstmt.close();
+			conn.close();
+		}
+
+三、数据库增添数据
