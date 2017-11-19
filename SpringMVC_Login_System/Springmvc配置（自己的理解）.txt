@@ -1,0 +1,47 @@
+一、有关springmvc的配置
+ web.xml:
+    1、实现转发页面(DispatcherServlet）
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    
+    2、实现找springmvc.xml
+        <param-value>classpath:springmvc.xml</param-value>
+
+    3、表示哪些请求交给Spring Web MVC处理
+	<url-pattern>/*</url-pattern>
+	“/” 是用来定义默认servlet映射的。也可以如“*.html”表示拦截所有以html为扩展名的请求。
+    
+
+ springmvp.xml:
+    1、扫描器（扫描com这个包）
+	<context:component-scan base-package="com" />
+
+    2、注解驱动（驱动后进行地址匹对）
+	<mvc:annotation-driven />
+
+    3、图形解析器(针对跳转后的页面解析)
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+		<!-- 前缀 -->
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<!-- 后缀 -->
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+
+注意，如果有提示版本号错误，则需要删除spring-context-4.0-.xsd的版本号（4.0）
+二、简述一个springmvc实现过程
+    以http://localhost:8080//WebProject3/index.do为例
+
+    1、用户发起请求，web.xml里的DispatcherServlet自动进行拦截，拦截WebProject3后面的东西。
+    2、通过<url-pattern>/*</url-pattern>可以知道拦了index.do。
+    3、接着通过<param-value>classpath:springmvc.xml</param-value>找到springmvc.xml，通过扫描器（扫描com这个包里面的所以内容）。
+    4、之后通过  注解驱动<mvc:annotation-driven />找到 @Controller的类。
+    5、找到类中与/index.do地址相同的驱动 @RequestMapping（"/index.do") 的方法，方法返回的是一个页面。
+    6、页面通过图形解析器去找到相对应的文件，前缀：/WEB-INF/jsp/与后缀：.jsp拼接，找到的一个jsp页面，最后响应给客户端。
+
+
+
+
+
+
+    
